@@ -1,0 +1,12 @@
+
+<shared-menu-bar (onValue)="filter($event)" (onShow)="showPopup()"  ></shared-menu-bar>
+<shared-popup-add *ngIf="popup" (onValue)="showPopup()" (onSubmitForm)="submitForm( )"  ></shared-popup-add>
+
+<br>
+
+<shared-table *ngIf="filterc" [sellers]="sellers" (onTable)="showModify($event)" ></shared-table>
+<shared-filtered-table  *ngIf="!filterc" (onValue)="shutDown($event)" (onTable)="showModify($event)" [newSellers]="filteredSeller" ></shared-filtered-table>
+
+<shared-popup-modify *ngIf="popupModify" [rowData]="rowData" (onTableOff)="showModify($event)" ></shared-popup-modify>
+
+<br>
