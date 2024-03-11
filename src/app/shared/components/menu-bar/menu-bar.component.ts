@@ -1,6 +1,8 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-
+import { Seller } from '../../information/interfaces/table.interface';
+import { InformationTableService } from '../../information/information-table.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'shared-menu-bar',
@@ -8,39 +10,35 @@ import { MenuItem } from 'primeng/api';
   styles: ``,
 })
 export class MenuBarComponent implements OnInit {
-  items: MenuItem[] | undefined;
-
-  public popup: boolean = false
-
-  @Output()
-  public onValue: EventEmitter<string> = new EventEmitter
+  public items!: MenuItem[];
+  public popup: boolean = false;
+  public sellers!: Seller[];
+  public totalRegs: any;
 
   @Output()
-  public onShow: EventEmitter<boolean> = new EventEmitter
+  public onValue: EventEmitter<string> = new EventEmitter();
+
+  @Output()
+  public onShow: EventEmitter<boolean> = new EventEmitter();
+
+  private sellersSubscription!: Subscription;
+
+  constructor(private getInf: InformationTableService) {}
 
   ngOnInit() {
-    this.items = [
-      {
-        label: 'Vendedores',
-        icon: 'pi pi-fw pi-user',
-        items: [],
-      },
-      {
-        label: 'Añadir',
-        icon: 'pi pi-fw pi-user-plus',
-        items: [],
-        command: () => this.showPopup()
-      },
-    ];
+    this.sellersSubscription = this.getInf.sellers$.subscribe(
+      (sellers: Seller[]) => {
+        this.sellers = sellers;
+        this.totalRegs = this.getInf.getTotalRegs( );
+      }
+    );
   }
 
-
-
-  public next( query:string ):void {
-    this.onValue.emit( query )
+  public SendToParent(query: string): void {
+    this.onValue.emit(query);
   }
 
-  public showPopup( ):void {
-    this.onShow.emit(  )
+  public showPopup(): void {
+    this.onShow.emit();
   }
 }

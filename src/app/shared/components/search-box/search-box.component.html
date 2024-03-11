@@ -1,7 +1,10 @@
-<form action="" [formGroup]="myForm" autocomplete="on">
+<form [formGroup]="myForm" autocomplete="on">
   <span class="p-input-icon-left">
     <i class="pi pi-search"></i>
-    <p-autoComplete [suggestions]="filteredOptions" (completeMethod)="filter($event)" (keyup.enter)="search()" formControlName="text"></p-autoComplete>
+    <p-autoComplete
+      [suggestions]="filteredOptions"
+      (keyup)="search()"
+      formControlName="text"
+    ></p-autoComplete>
   </span>
 </form>
-

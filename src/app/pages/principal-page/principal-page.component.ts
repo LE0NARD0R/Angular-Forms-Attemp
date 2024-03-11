@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InformationTableService } from '../../shared/information/information-table.service';
 import { Seller } from '../../shared/information/interfaces/table.interface';
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'principal-page',
@@ -35,12 +36,13 @@ export class PrincipalPageComponent implements OnInit {
   }
 
   public showPopup(): void {
+    this.sellers = [...this.getInf.sellers];
     this.popup = !this.popup;
   }
 
   public submitForm(): void {
-    this.popup = !this.popup;
     this.sellers = [...this.getInf.sellers];
+    this.popup = !this.popup;
   }
 
   public showModify( rowData:any ):void {
