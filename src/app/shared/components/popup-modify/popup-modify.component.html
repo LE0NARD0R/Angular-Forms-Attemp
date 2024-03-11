@@ -2,8 +2,8 @@
   <div class="modal-content">
     <h2>{{ rowData.name }}</h2>
     <h3>Productos</h3>
-    <div class="justify-content-center">
-      <form >
+    <div class="p-grid">
+      <form class="p-col">
         <table class="table-container">
           <thead>
             <tr>
@@ -14,38 +14,78 @@
               <th>Descripción</th>
             </tr>
           </thead>
-          <tbody [formGroup]="productForm" >
-            <ng-container formArrayName="tableRows" *ngFor="let group of getFormControls.controls; let i=index">
+          <tbody [formGroup]="productForm">
+            <ng-container
+              formArrayName="productsRow"
+              *ngFor="let group of getFormControls.controls; let i = index"
+            >
               <tr [formGroupName]="i" (keyup.enter)="submitForm()">
-                <td><input type="number" pInputText class="formControl"  formControlName="id" /></td>
-                <td><input type="text" pInputText class="formControl" formControlName="name" /></td>
-                <td><input type="number" pInputText class="formControl" formControlName="units" /></td>
-                <td><input type="number" pInputText class="formControl" formControlName="price" /></td>
-                <td><input type="text" pInputText class="formControl" formControlName="description" /></td>
+                <td>
+                  <input
+                    type="number"
+                    pInputText
+                    class="formControl"
+                    formControlName="id"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    pInputText
+                    class="formControl"
+                    formControlName="name"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    pInputText
+                    class="formControl"
+                    formControlName="units"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    pInputText
+                    class="formControl"
+                    formControlName="price"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    pInputText
+                    class="formControl"
+                    formControlName="description"
+                  />
+                </td>
               </tr>
             </ng-container>
           </tbody>
         </table>
       </form>
-      <br>
-      <p-button
-        class="p-2"
-        label="Añadir Producto"
-        [rounded]="true"
-        (click)="addRow()"
-      ></p-button>
-      <p-button
-        class="p-2"
-        label="Modificar"
-        [rounded]="true"
-        (click)="submitForm()"
-      ></p-button>
-      <p-button
-        class="p-2"
-        label="Cancelar"
-        [rounded]="true"
-        (click)="tableOff()"
-      ></p-button>
+      <br />
+      <div class="grid">
+        <p-button
+          class="col"
+          label="Añadir Producto"
+          [rounded]="true"
+          (click)="addRow()"
+        ></p-button>
+        <p-button
+          class="col"
+          label="Modificar"
+          [rounded]="true"
+          (click)="submitForm()"
+        ></p-button>
+        <p-button
+          class="col"
+          label="Cancelar"
+          [rounded]="true"
+          (click)="tableOff()"
+        ></p-button>
+      </div>
     </div>
   </div>
 </div>

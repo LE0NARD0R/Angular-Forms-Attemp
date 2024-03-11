@@ -1,11 +1,21 @@
-
-<div class="card">
-  <p-menubar [model]="items">
-
-    <shared-search-box (onValue)="next($event)" ></shared-search-box>
-
-  </p-menubar>
-
-
+<div class="card border-round">
+  <div
+    id="navbar"
+    class="grid bg-primary border-round align-items-center"
+  >
+    <div class="col-12 md:col flex justify-content-center m-2" id="title"><h2>Vendedores</h2></div>
+    <div class="col-12 md:col flex justify-content-center m-2" id="add" (click)="showPopup()"><span class="pi pi-fw pi-user-plus"></span> Añadir</div>
+    <div class="col-12 md:col flex justify-content-center m-2" id="sellers">
+      Vendedores: {{ totalRegs[0] }}
+    </div>
+    <div class="col-12 md:col flex justify-content-center m-2" id="total">
+      Total Neto: {{ totalRegs[1] | number }}
+    </div>
+    <div class="col-12 md:col flex justify-content-center m-2 right-0" id="search box">
+      <shared-search-box (onValue)="SendToParent($event)"></shared-search-box>
+    </div>
+  </div>
 </div>
-
+<!-- {{ totalRegs | json }}
+<br>
+{{ sellers | json }} -->

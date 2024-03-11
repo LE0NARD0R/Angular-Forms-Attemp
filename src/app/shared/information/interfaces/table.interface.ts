@@ -3,7 +3,7 @@ export interface Seller {
   name: string;
   TotalSells: number;
   TotalPrice: number;
-  products?: Sells[];
+  productsRow?: Sells[];
 }
 
 export interface Sells {

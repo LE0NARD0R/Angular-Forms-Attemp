@@ -1,38 +1,44 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { InformationTableService } from '../../information/information-table.service';
 import { Seller } from '../../information/interfaces/table.interface';
+import { Subscription, map, tap } from 'rxjs';
 
 @Component({
   selector: 'shared-table',
   templateUrl: './table.component.html',
-  styles: ``
+  styles: ``,
 })
-export class TableComponent implements OnInit{
-
-  @Input()
-  public sellers: Seller[] = []
+export class TableComponent implements OnInit {
 
   @Output()
-  public onTable: EventEmitter<any> = new EventEmitter
+  public onTable: EventEmitter<any> = new EventEmitter();
 
-  public cols: any
+  public sellers:Seller[] = [];
 
-  constructor( private getInf: InformationTableService ) {  }
+  public cols: any;
+
+  private sellersSubscription!: Subscription;
+
+  constructor(private getInf: InformationTableService) {}
 
   ngOnInit() {
-
     this.cols = [
       { field: 'ID', header: 'ID' },
       { field: 'name', header: 'Nombre' },
       { field: 'TotalSells', header: 'Total Ventas' },
-      { field: 'TotalPrice', header: 'Total Precios' }
+      { field: 'TotalPrice', header: 'Total Precios' },
     ];
+
+    this.sellersSubscription = this.getInf.sellers$.subscribe((sellers: Seller[]) => {
+      this.sellers = sellers;
+    });
   }
 
-  showPopup( rowData:any ):void {
-    this.onTable.emit(rowData)
+
+
+  showPopup(rowData: any): void {
+    this.onTable.emit(rowData);
   }
 
-  // TODO: una función que pueda cambiar alguna propiedad para que se muestre un popup con otra tabla que pueda modificar valores
 
 }

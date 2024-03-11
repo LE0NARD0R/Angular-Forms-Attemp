@@ -4,37 +4,34 @@ import { Seller } from '../../information/interfaces/table.interface';
 @Component({
   selector: 'shared-filtered-table',
   templateUrl: './filtered-table.component.html',
-  styles: ``
+  styles: ``,
 })
-export class FilteredTableComponent implements OnInit{
+export class FilteredTableComponent implements OnInit {
+  @Output()
+  public onValue: EventEmitter<boolean> = new EventEmitter();
 
   @Output()
-  public onValue: EventEmitter<boolean> = new EventEmitter
-
-  @Output()
-  public onTable: EventEmitter<boolean> = new EventEmitter
+  public onTable: EventEmitter<boolean> = new EventEmitter();
 
   @Input()
-  public newSellers!: Seller[]
+  public newSellers!: Seller[];
 
-  public cols: any
+  public cols: any;
 
   ngOnInit() {
-
     this.cols = [
       { field: 'ID', header: 'ID' },
       { field: 'name', header: 'Nombre' },
       { field: 'TotalSells', header: 'Total Ventas' },
-      { field: 'TotalPrice', header: 'Total Precios' }
+      { field: 'TotalPrice', header: 'Total Precios' },
     ];
   }
 
-  public shutDownTable():void {
-    this.onValue.emit( true )
+  public shutDownTable(): void {
+    this.onValue.emit(true);
   }
 
-  showPopup( rowData:any ):void {
-    this.onTable.emit(rowData)
+  showPopup(rowData: any): void {
+    this.onTable.emit(rowData);
   }
-
 }

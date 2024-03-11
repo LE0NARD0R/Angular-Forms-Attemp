@@ -1,15 +1,19 @@
 <div class="modal-overlay">
   <div class="modal-content">
     <h2>Añadir vendedor</h2>
-    <form [formGroup]="myForm" (ngSubmit)="submitForm()">
+    <form
+      [formGroup]="myForm"
+      (ngSubmit)="submitForm()"
+      (keyup.enter)="submitForm()"
+    >
       <div class="grid">
-        <div class="col-6">
+        <div class="p-col-12 p-md-6 mt-2 m-auto">
           <span class="p-float-label">
             <input formControlName="id" pInputText id="ID" />
             <label for="ID">ID</label>
           </span>
         </div>
-        <div class="col-6">
+        <div class="p-col-12 p-md-6 mt-2 m-auto">
           <span class="p-float-label">
             <input formControlName="name" pInputText id="name" />
             <label for="name">Nombre</label>
@@ -17,46 +21,43 @@
         </div>
       </div>
 
-      <h3>Productos Vendidos</h3>
+      <h3 *ngIf="addProductForm">Productos Vendidos</h3>
       <ng-container
-        formArrayName="products"
+        formArrayName="productsRow"
         *ngFor="
-          let product of products.controls;
+          let product of productsRow.controls;
           let i = index;
           let isLast = last
         "
       >
-        <div class="grid" [formGroupName]="i" *ngIf="isLast">
-          <div class="col-6">
+        <div class="grid" [formGroupName]="i" *ngIf="isLast && addProductForm">
+          <div class="p-col-12 p-md-6 my-3 m-auto">
             <span class="p-float-label">
-              <input formControlName="id_product" pInputText id="id_product" />
+              <input formControlName="id" pInputText id="id_product" />
               <label for="id_product">ID</label>
             </span>
           </div>
-          <div class="col-6">
+          <div class="p-col-12 p-md-6 my-3 m-auto">
             <span class="p-float-label">
-              <input
-                formControlName="name_product"
-                pInputText
-                id="product_name"
-              />
+              <input formControlName="name" pInputText id="product_name" />
               <label for="product_name">Producto</label>
             </span>
           </div>
           <br />
-          <div class="col-4">
+          <br />
+          <div class="p-col-12 p-md-4 my-3 m-auto">
             <span class="p-float-label">
-              <input formControlName="selled" pInputText id="selled" />
+              <input formControlName="units" pInputText id="selled" />
               <label for="selled">Vendidos</label>
             </span>
           </div>
-          <div class="col-4">
+          <div class="p-col-12 p-md-4 my-3 m-auto">
             <span class="p-float-label">
               <input formControlName="price" pInputText id="price" />
               <label for="price">Precio</label>
             </span>
           </div>
-          <div class="col-4">
+          <div class="p-col-12 p-md-4 my-3 m-auto">
             <span class="p-float-label">
               <input
                 formControlName="description"
@@ -69,24 +70,28 @@
         </div>
       </ng-container>
       <br />
-      <p-button
-        class="p-2"
-        label="Añadir Producto"
-        [rounded]="true"
-        (click)="addProduct()"
-      ></p-button>
-      <p-button
-        class="p-2"
-        label="Añadir"
-        [rounded]="true"
-        (click)="submitForm()"
-      ></p-button>
-      <p-button
-        class="p-2"
-        label="Cancelar"
-        [rounded]="true"
-        (click)="closePopup()"
-      ></p-button>
+      <div class="p-grid">
+        <div class="p-col-12 p-md-4">
+          <p-button
+            class="m-1 p-1"
+            label="Añadir Producto"
+            [rounded]="true"
+            (click)="addProduct()"
+          ></p-button>
+          <p-button
+            class="m-1 p-1"
+            label="Añadir"
+            [rounded]="true"
+            (click)="submitForm()"
+          ></p-button>
+          <p-button
+            class="m-1 p-1"
+            label="Cancelar"
+            [rounded]="true"
+            (click)="closePopup()"
+          ></p-button>
+        </div>
+      </div>
     </form>
   </div>
 </div>
