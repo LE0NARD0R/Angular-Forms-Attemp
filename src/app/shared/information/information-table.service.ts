@@ -1,6 +1,8 @@
+import { AutoCompleteCompleteEvent } from 'primeng/autocomplete/autocomplete.interface';
+import { BehaviorSubject, Subject, debounceTime, map, tap } from 'rxjs';
+import { FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Injectable } from '@angular/core';
 import { Seller } from './interfaces/table.interface';
-import { AutoCompleteCompleteEvent } from 'primeng/autocomplete/autocomplete.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,7 @@ export class InformationTableService {
       name: 'Sarah',
       TotalSells: 56,
       TotalPrice: 6720,
-      products: [
+      productsRow: [
         {
           id: 2345,
           name: 'televisor',
@@ -55,7 +57,7 @@ export class InformationTableService {
       name: 'Armando',
       TotalSells: 60,
       TotalPrice: 19000,
-      products: [
+      productsRow: [
         {
           id: 5678,
           name: 'Laptop',
@@ -92,7 +94,7 @@ export class InformationTableService {
       name: 'Fernando',
       TotalSells: 18,
       TotalPrice: 5500,
-      products: [
+      productsRow: [
         {
           id: 5678,
           name: 'Laptop',
@@ -129,7 +131,7 @@ export class InformationTableService {
       name: 'Juan',
       TotalSells: 120,
       TotalPrice: 30000,
-      products: [
+      productsRow: [
         {
           id: 5678,
           name: 'Laptop',
@@ -166,7 +168,7 @@ export class InformationTableService {
       name: 'Franco',
       TotalSells: 95,
       TotalPrice: 32000,
-      products: [
+      productsRow: [
         {
           id: 5678,
           name: 'Laptop',
@@ -206,28 +208,39 @@ export class InformationTableService {
     },
   ];
 
-  constructor(  ) {
-    this.loadLocalStorage()
+  public sellerSubject$ = new BehaviorSubject(this._sellers)
+
+  public alert: boolean = false
+
+  constructor(private fb: FormBuilder) {
+    this.loadLocalStorage();
+  }
+
+  get sellers$() {
+    return this.sellerSubject$.asObservable()
   }
 
   get sellers(): Seller[] {
-    return [...this._sellers];
+    return this.sellerSubject$.value
   }
 
-  public filterSellers(query: any, name: boolean = false): any {
-    let filtered: any[] = [];
-
+  public filterSellers(query: any, name: boolean = false): Seller[] {
+    let filtered: Seller[] = [];
     for (let i = 0; i < (this.sellers as any[]).length; i++) {
-      let seller = (this.sellers as any[])[i];
+      let seller = (this.sellerSubject$.value as any[])[i];
       if (isNaN(query)) {
         if (seller.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        if ( name ) filtered.push(seller.name);
-        else {filtered.push(seller)};
+          if (name) filtered.push(seller.name);
+          else {
+            filtered.push(seller);
+          }
         }
       } else {
         if (seller.ID.toString().startsWith(query)) {
-          if ( name ) filtered.push(seller.ID);
-          else {filtered.push(seller)};
+          if (name) filtered.push(seller.ID);
+          else {
+            filtered.push(seller);
+          }
         }
       }
     }
@@ -235,91 +248,148 @@ export class InformationTableService {
     return filtered;
   }
 
-  public organize( rawForm:any ):Seller {
+  public getTotalRegs( ):any {
+    let vendedores = this.sellerSubject$.value
+    const len = vendedores.length
+    let totalSells = 0
+    for ( let seller of vendedores ) {
+      totalSells += seller.TotalPrice
+    }
 
-    let selled = 0;
-    let totalPrice = 0;
+    return [len, totalSells]
+  }
 
-    for (const product of rawForm.products) {
-      const idProduct = product.id_product;
-      if (idProduct) {
-        selled += product.selled || 0;
-        totalPrice += (product.price || 0) * (product.selled || 0);
+  public createSellersForm(data?: any): FormGroup {
+    if (data) {
+      return this.fb.group({
+        id: [
+          data.ID,
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.pattern('^[0-9]*$'),
+          ],
+        ],
+        name: [data.name, [Validators.required, Validators.minLength(3)]],
+        productsRow: this.fb.array([]),
+      });
+    } else {
+      return this.fb.group({
+        id: [
+          0,
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.pattern('^[0-9]*$'),
+          ],
+        ],
+        name: ['', [Validators.required, Validators.minLength(3)]],
+        productsRow: this.fb.array([]),
+      });
+    }
+  }
+
+  public createProductsRowFormGroup(data?: any): FormGroup {
+    if (data) {
+      return this.fb.group({
+        id: [
+          data.id,
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.pattern('^[0-9]*$'),
+          ],
+        ],
+        name: [data.name, [Validators.required, Validators.minLength(3)]],
+        units: [data.units, [Validators.required]],
+        price: [data.price, [Validators.required]],
+        description: [data.description],
+      });
+    } else {
+      return this.fb.group({
+        id: [
+          0,
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.pattern('^[0-9]*$'),
+          ],
+        ],
+        name: ['', [Validators.required, Validators.minLength(3)]],
+        units: [0, [Validators.required]],
+        price: [0, [Validators.required]],
+        description: [''],
+      });
+    }
+  }
+
+  public organize(rawForm: any): Seller {
+    let units: number = 0;
+    let totalPrice:number = 0;
+
+    for (const product of rawForm.productsRow) {
+      if (product.id) {
+        units += +product.units || 0;
+        totalPrice += (+product.price || 0) * (+product.units || 0);
       }
     }
 
     return {
       ID: rawForm.id,
       name: rawForm.name,
-      TotalSells: selled,
+      TotalSells: units,
       TotalPrice: totalPrice,
+      productsRow: rawForm.productsRow,
     };
+  }
+
+  public refreshInfo(newSeller: Seller): void {
+    const sellers:Seller[] = this.sellerSubject$.value
+    this.sellerSubject$.pipe(
+      debounceTime(3000),
+      map( () => {
+        for (let i = 0; i < this.sellers.length; i++){
+          if ( sellers[i].ID === newSeller.ID) return
+        }
+        sellers.push( newSeller )
+        this.sellerSubject$.next(sellers)
+        this.savedLocalStorage();
+        console.log('corrió')
+      } ),
+    ).subscribe()
 
   }
 
-  public refreshInfo( newSeller: Seller ): void{
-    this._sellers.push( newSeller )
-    this.savedLocalStorage()
-  }
+  public updateInfo(newSeller: Seller): void {
+    const sellers = this.sellerSubject$.value
+    let done: boolean = false
+    this.sellerSubject$.pipe(
+      debounceTime(3000),
+      map(() => {
+        if (done) return
+        for (let i = 0; i < this.sellers.length; i++) {
+          if ( sellers[i].ID === newSeller.ID) {
+            sellers[i].TotalPrice = newSeller.TotalPrice;
+            sellers[i].TotalSells = newSeller.TotalSells;
+            sellers[i].productsRow = newSeller.productsRow;
+            done = true
+          }
+        }
+        this.sellerSubject$.next(sellers)
+        this.savedLocalStorage();
+      })
+    ).subscribe()
 
-  public organizeInfForEditTable(data: Seller):Seller {
-    let info: Seller = {
-      ID: 0,
-      name: '',
-      TotalSells: 0,
-      TotalPrice: 0,
-      products: []
-    }
-
-    info.ID = data.ID
-    info.name = data.name
-    info.TotalSells = data.TotalSells
-    info.TotalPrice = data.TotalPrice
-    info.products = data.products
-
-    return info
-  }
-
-  public organizeForModify( rawForm:any ):Seller {
-
-    let selled = 0;
-    let totalPrice = 0;
-    for (const product of rawForm.tableRows ) {
-      const idProduct = product.id;
-      if (idProduct) {
-        selled += product.units || 0;
-        totalPrice += (product.price || 0) * (product.units || 0);
-      }
-    }
-
-    return {
-      ID: rawForm.id,
-      name: rawForm.name,
-      TotalSells: selled,
-      TotalPrice: totalPrice,
-      products: rawForm.tableRows
-    };
 
   }
 
-  public updateInfo( newSeller: Seller ): void{
-    for ( let i = 0; i < this._sellers.length; i++ ){
-      if( this._sellers[i].ID === newSeller.ID ) {
-        this._sellers[i].TotalPrice = newSeller.TotalPrice
-        this._sellers[i].TotalSells = newSeller.TotalSells
-        this._sellers[i].products = newSeller.products
-      }
-    }
-    this.savedLocalStorage()
+  private savedLocalStorage(): void {
+    localStorage.setItem('sellers', JSON.stringify(this.sellerSubject$.value));
   }
 
-  private savedLocalStorage():void {
-    localStorage.setItem('sellers', JSON.stringify( this._sellers ))
-  }
-
-  private loadLocalStorage():void {
-    if ( !localStorage.getItem('sellers') ) return
-    this._sellers = JSON.parse( localStorage.getItem('sellers')! )
+  private loadLocalStorage(): void {
+    if (!localStorage.getItem('sellers')) return;
+    this.sellerSubject$.next(JSON.parse(localStorage.getItem('sellers')!))
   }
 
 }
